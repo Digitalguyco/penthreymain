@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --border: 0 0% 89.8%;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-primary: var(--font-manrope);
+}
+
+/* Dark mode styles removed to permanently use light mode */
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+}
