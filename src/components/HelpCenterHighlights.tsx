@@ -84,7 +84,7 @@ export default function HelpCenterHighlights() {
         </div>
         <div className="w-full max-w-sm mx-auto flex flex-col justify-start items-start gap-1.5">
           <form onSubmit={handleSearchSubmit} className="self-stretch flex flex-col justify-start items-start gap-1.5">
-            <div className="self-stretch px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline outline-1 outline-offset-[-1px] outline-gray-400 inline-flex justify-start items-center gap-2 overflow-hidden focus-within:outline-indigo-500 focus-within:outline-2 transition-all duration-200">
+            <div className="self-stretch px-3.5 py-2.5 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline-1 outline-offset-[-1px] outline-gray-400 inline-flex justify-start items-center gap-2 overflow-hidden focus-within:outline-indigo-500 focus-within:outline-2 transition-all duration-200">
               <div className="flex-1 flex justify-start items-center gap-2.5">
                 <div className="w-5 h-5 relative overflow-hidden flex-shrink-0">
                   <svg className="w-full h-full text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
