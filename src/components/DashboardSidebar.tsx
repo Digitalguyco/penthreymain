@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavigationItem {
   name: string;
@@ -37,24 +39,47 @@ interface DashboardSidebarProps {
 
 export default function DashboardSidebar({ isMobileMenuOpen = false, setIsMobileMenuOpen }: DashboardSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { logout } = useAuth();
+  const router = useRouter();
+  
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
-  const NavItem = ({ item, onClick }: { item: NavigationItem, onClick?: () => void }) => (
-    <div 
-      className={`px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer transition-colors ${
-        item.active 
-          ? 'bg-indigo-950 text-zinc-100' 
-          : 'text-zinc-100 hover:bg-indigo-800'
-      }`}
-      onClick={onClick}
-    >
-      <Image src={`icons/${item.icon}.svg`} width={15} height={15} alt='alt'/>
-      {!isCollapsed && (
-        <span className="text-sm font-medium font-['Manrope'] leading-tight">
-          {item.name}
-        </span>
-      )}
-    </div>
-  );
+  const NavItem = ({ item, onClick }: { item: NavigationItem, onClick?: () => void }) => {
+    const handleClick = () => {
+      if (item.name === 'Log Out') {
+        console.log('Logging out...');
+        handleLogout();
+      } else if (onClick) {
+        onClick();
+      }
+    };
+    
+    return (
+      <div 
+        className={`px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer transition-colors ${
+          item.active 
+            ? 'bg-indigo-950 text-zinc-100' 
+            : 'text-zinc-100 hover:bg-indigo-800'
+        } ${item.name === 'Log Out' ? 'hover:bg-red-600' : ''}`}
+        onClick={handleClick}
+      >
+        <Image src={`icons/${item.icon}.svg`} width={15} height={15} alt='alt'/>
+        {!isCollapsed && (
+          <div className="text-zinc-100 text-sm font-medium font-['Manrope'] leading-tight">
+            {item.name}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const handleMobileNavClick = () => {
     if (setIsMobileMenuOpen) {

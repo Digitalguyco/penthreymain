@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import SignupForm from '@/components/SignupForm';
+import MultiStepSignupForm from '@/components/MultiStepSignupForm';
 
 export const metadata: Metadata = {
   title: 'Sign Up - Penthry | Get Started Today',
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function Signup() {
-  return <SignupForm />;
+  return <MultiStepSignupForm />;
 } 

@@ -1,7 +1,10 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import DashboardStats from "./DashboardStats";
+import AddTeamMemberModal from "./AddTeamMemberModal";
 
 interface DashboardContentProps {
   isMobileMenuOpen?: boolean;
@@ -17,12 +20,36 @@ export default function DashboardContent({ isMobileMenuOpen = false, setIsMobile
       day: "numeric",
     })
   );
+  
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [showAddTeamMemberModal, setShowAddTeamMemberModal] = useState(false);
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  
+  // Get user initials
+  const getUserInitials = () => {
+    if (!user) return "U";
+    const firstInitial = user.first_name ? user.first_name[0].toUpperCase() : "";
+    const lastInitial = user.last_name ? user.last_name[0].toUpperCase() : "";
+    return `${firstInitial}${lastInitial}` || user.username[0].toUpperCase();
+  };
+  
+  // Handle logout
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
+  };
 
   const actionButtons = [
-    { name: "Customer Feedback", style: "secondary" },
-    { name: "Create Invoice", style: "secondary" },
-    { name: "New Team Member", style: "primary" },
+    { name: "Customer Feedback", style: "secondary", onClick: () => {} },
+    { name: "Create Invoice", style: "secondary", onClick: () => {} },
+    { name: "Add Team Member", style: "primary", onClick: () => setShowAddTeamMemberModal(true) },
   ];
+  
+  const handleTeamMemberAdded = () => {
+    // Refresh organization stats or member list
+    console.log('Team member invitation sent successfully!');
+  };
 
   return (
     <div className="flex-1 p-2 lg:p-6 flex flex-col gap-4 lg:gap-6 overflow-y-auto">
@@ -75,13 +102,75 @@ export default function DashboardContent({ isMobileMenuOpen = false, setIsMobile
             {currentDate}
           </div>
           <Image src="icons/bellBlack.svg" width={15} height={15} alt="bell" />
-          <div className="flex items-center gap-1.5">
-            <div className="px-1.5 py-1 bg-white rounded-full">
-              <div className="text-indigo-400 text-base font-semibold font-['Manrope'] leading-normal">
-                JD
+          <div className="relative">
+            <div 
+              className="flex items-center gap-1.5 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors"
+              onClick={() => setShowUserDropdown(!showUserDropdown)}
+            >
+              <div className="px-1.5 py-1 bg-white rounded-full border border-gray-200">
+                <div className="text-indigo-400 text-base font-semibold font-['Manrope'] leading-normal">
+                  {getUserInitials()}
+                </div>
               </div>
+              <Image src="dropdown-dark.svg" height={10} width={10} alt="drop" className={`transition-transform ${
+                showUserDropdown ? 'rotate-180' : ''
+              }`} />
             </div>
-            <Image src="dropdown-dark.svg" height={10} width={10} alt="drop" />
+            
+            {/* User Dropdown */}
+            {showUserDropdown && (
+              <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <div className="font-semibold text-gray-900">
+                    {user?.first_name && user?.last_name 
+                      ? `${user.first_name} ${user.last_name}` 
+                      : user?.username || 'User'}
+                  </div>
+                  <div className="text-sm text-gray-500">{user?.email}</div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    Role: {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'User'}
+                  </div>
+                </div>
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      setShowUserDropdown(false);
+                      // Add profile navigation here if needed
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    View Profile
+                  </button>
+                  {user?.role === 'admin' && (
+                    <button
+                      onClick={() => {
+                        setShowUserDropdown(false);
+                        // Add organization profile navigation here
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Organization Profile
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      setShowUserDropdown(false);
+                      // Add settings navigation here if needed
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Settings
+                  </button>
+                  <hr className="my-1" />
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -96,7 +185,7 @@ export default function DashboardContent({ isMobileMenuOpen = false, setIsMobile
         {/* Welcome Text */}
         <div className="relative z-10 flex flex-col gap-1">
           <h1 className="text-zinc-800 text-2xl font-medium font-['Manrope'] leading-9">
-            Welcome back, Olivia
+            Welcome back, {user?.first_name || user?.username || 'User'}
           </h1>
           <p className="text-neutral-600 text-sm font-normal font-['Manrope'] leading-tight">
             Here&apos;s what&apos;s happening today.
@@ -475,9 +564,10 @@ export default function DashboardContent({ isMobileMenuOpen = false, setIsMobile
           {actionButtons.map((button, index) => (
             <button
               key={index}
+              onClick={button.onClick}
               className={`p-4 rounded-lg shadow-[0px_1px_4px_0px_rgba(0,0,0,0.16)] border border-teal-400 flex items-center gap-2 transition-colors ${
                 button.style === "primary"
-                  ? "bg-teal-400 text-zinc-800"
+                  ? "bg-teal-400 text-zinc-800 hover:bg-teal-500"
                   : "bg-white text-zinc-800 hover:bg-gray-50"
               }`}
             >
@@ -804,12 +894,12 @@ export default function DashboardContent({ isMobileMenuOpen = false, setIsMobile
             <path
               d="M63.5879 73.7922L57.1279 68.3682"
               stroke="#8184F8"
-              stroke-miterlimit="10"
+              strokeMiterlimit="10"
             />
             <path
               d="M66.9358 76.6038L64.9678 74.9478"
               stroke="#8184F8"
-              stroke-miterlimit="10"
+              strokeMiterlimit="10"
             />
             <path
               d="M86.2881 87.9561L107.6 61.3201L79.2241 37.4961L60.4241 59.0681L57.6241 64.4641C57.4851 64.6173 57.3792 64.7975 57.313 64.9935C57.2468 65.1894 57.2217 65.397 57.2394 65.6031C57.257 65.8092 57.317 66.0094 57.4155 66.1913C57.5141 66.3732 57.6491 66.5328 57.8121 66.6601L83.4121 88.1561C83.8284 88.4915 84.356 88.6573 84.8893 88.6202C85.4226 88.5831 85.9223 88.3459 86.2881 87.9561Z"
@@ -1029,6 +1119,13 @@ export default function DashboardContent({ isMobileMenuOpen = false, setIsMobile
           </div>
         </div>
       </div>
+      
+      {/* Add Team Member Modal */}
+      <AddTeamMemberModal
+        isOpen={showAddTeamMemberModal}
+        onClose={() => setShowAddTeamMemberModal(false)}
+        onSuccess={handleTeamMemberAdded}
+      />
     </div>
   );
 }
