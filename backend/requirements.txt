@@ -1,8 +1,10 @@
+asgiref==3.9.1
 Django==5.2.4
+django-cors-headers==4.3.1
 djangorestframework==3.16.0
 djangorestframework-simplejwt==5.3.0
-django-cors-headers==4.3.1
+pillow==11.3.0
+PyJWT==2.10.1
 python-dotenv==1.0.0
-Pillow==11.0.0
-setuptools==75.1.0
-PyMySQL==1.1.0
+setuptools==80.9.0
+sqlparse==0.5.3
