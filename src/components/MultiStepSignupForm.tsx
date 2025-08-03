@@ -22,8 +22,11 @@ interface FormData {
 
 export default function MultiStepSignupForm() {
   const searchParams = useSearchParams();
-  const inviteToken = searchParams?.get('invite');
+  const inviteToken = searchParams?.get('token'); // Changed from 'invite' to 'token'
   const isInviteRegistration = !!inviteToken;
+  
+  console.log('Signup Form - Invite token:', inviteToken);
+  console.log('Signup Form - Is invite registration:', isInviteRegistration);
   
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({

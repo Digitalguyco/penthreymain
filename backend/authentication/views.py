@@ -49,6 +49,9 @@ class UserRegistrationView(generics.CreateAPIView):
             # FLOW 2: Invite-based registration (staff/manager)
             # No email verification needed, auto-login
             refresh = RefreshToken.for_user(user)
+            # set user is_verified to true
+            user.is_verified = True
+            user.save()
             
             return Response({
                 'message': 'Registration successful! Welcome to the team.',

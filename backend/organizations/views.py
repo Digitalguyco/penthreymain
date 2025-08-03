@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
 import secrets
+from authentication import email_service
 
 from .models import Organization, OrganizationInvite
 from .serializers import (
@@ -132,6 +133,7 @@ class InviteUserView(APIView):
     def post(self, request):
         # Check if organization can add more users
         organization = request.user.organization
+        print(request.data)
         if not organization.can_add_users():
             return Response({
                 'error': 'User limit reached for your subscription plan'
@@ -148,6 +150,9 @@ class InviteUserView(APIView):
         
         # Generate invite token
         invite_token = secrets.token_urlsafe(32)
+
+                # Send email to the invited user
+        email_service.EmailService.send_invite_email(email, role, organization, invite_token)
         
         # Create invite
         invite = OrganizationInvite.objects.create(
@@ -158,7 +163,8 @@ class InviteUserView(APIView):
             token=invite_token,
             expires_at=timezone.now() + timedelta(days=7)
         )
-        
+
+
         # In production, send email with invite link
         return Response({
             'message': 'Invitation sent successfully',

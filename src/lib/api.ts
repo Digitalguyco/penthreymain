@@ -224,14 +224,18 @@ class ApiClient {
   
   // Authentication endpoints
   async login(email: string, password: string): Promise<ApiResponse<LoginResponse>> {
-    console.log(this.makeRequest<LoginResponse>('/auth/login/', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    }));
-    return this.makeRequest<LoginResponse>('/auth/login/', {
+    const response = await this.makeRequest<LoginResponse>('/auth/login/', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
+    // set tokens
+    if (response.data) {
+      tokenManager.setTokens({ 
+        access: response.data.tokens.access, 
+        refresh: response.data.tokens.refresh 
+      });
+    }
+    return response;
   }
   
   async register(data: RegisterData): Promise<ApiResponse<LoginResponse>> {

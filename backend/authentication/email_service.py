@@ -95,3 +95,39 @@ class EmailService:
         """Send welcome email after email verification (to be implemented)"""
         # TODO: Create welcome email template and implement
         pass
+
+    @staticmethod
+    def send_invite_email(email, role, organization, invite_token):
+        # email sending timeout
+        invite_timeout = 7
+        try:
+            # Build invite URL
+            invite_url = f"{settings.FRONTEND_URL}/signup?token={invite_token}"
+            
+            # Render HTML email template
+            html_content = render_to_string('emails/invite_email.html', {
+                'user': email,
+                'invite_url': invite_url,
+                'role': role,
+                'organization': organization,
+            })
+            
+            # Create plain text version of the email    
+            text_content = strip_tags(html_content)
+            
+            # Send email
+            send_mail(
+                subject='You have been invited to join Penthrey',
+                message=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                html_message=html_content,
+                fail_silently=False,
+            )
+            
+            logger.info(f"Invite email sent successfully to {email}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to send invite email to {email}: {str(e)}")
+            return False
