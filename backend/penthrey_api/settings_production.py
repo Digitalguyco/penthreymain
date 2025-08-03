@@ -10,9 +10,9 @@ DEBUG = False
 
 # Add your domain/IP to allowed hosts
 ALLOWED_HOSTS = [
-    'your-domain.com',  # Replace with your domain
-    'your-vps-ip',      # Replace with your VPS IP
-    'www.your-domain.com',
+    'penthrey.com',  # Replace with your domain
+    '203.161.55.38',      # Replace with your VPS IP
+    'www.penthrey.com',
 ]
 
 # Database configuration for MySQL
@@ -47,7 +47,7 @@ X_FRAME_OPTIONS = 'DENY'
 # CORS settings for production (adjust frontend URL)
 CORS_ALLOWED_ORIGINS = [
     "https://penthrey.com",  # Replace with your frontend domain
-    "http://penthrey.com:3000",          # For testing
+    "http://203.161.55.38:3000",          # For testing
 ]
 
 # Update CSRF trusted origins for production
