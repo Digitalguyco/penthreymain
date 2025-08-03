@@ -1,6 +1,10 @@
 import os
 from .settings import *
 
+# mysql install with pymysql
+import pymysql
+pymysql.install_as_MySQLdb()
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -42,18 +46,18 @@ X_FRAME_OPTIONS = 'DENY'
 
 # CORS settings for production (adjust frontend URL)
 CORS_ALLOWED_ORIGINS = [
-    "https://your-frontend-domain.com",  # Replace with your frontend domain
-    "http://your-vps-ip:3000",          # For testing
+    "https://penthrey.com",  # Replace with your frontend domain
+    "http://penthrey.com:3000",          # For testing
 ]
 
 # Update CSRF trusted origins for production
 CSRF_TRUSTED_ORIGINS = [
-    "https://your-domain.com",
-    "https://www.your-domain.com",
+    "https://penthrey.com",
+    "https://www.penthrey.com",
 ]
 
 # Frontend URL for production
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://your-frontend-domain.com')
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://penthrey.com')
 
 # Email configuration (you can keep Gmail or switch to a service like SendGrid)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
