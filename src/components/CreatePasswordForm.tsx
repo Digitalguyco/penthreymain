@@ -37,7 +37,7 @@ export default function CreatePasswordForm() {
       }
     });
     setRequirements(newRequirements);
-  }, [password]);
+  }, [password, requirements]);
 
   const allRequirementsMet = requirements.every(req => req.met);
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;

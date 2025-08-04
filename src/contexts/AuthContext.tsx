@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return false;
     } catch (error: unknown) {
       console.error('Login error:', error);
-      const errorData = (error as any)?.response?.data;
+      const errorData = (error as { response?: { data?: { code?: string; error?: string } } })?.response?.data;
       
       if (errorData?.code === 'EMAIL_NOT_VERIFIED') {
         setError('Please verify your email address before logging in. Check your email for verification instructions.');

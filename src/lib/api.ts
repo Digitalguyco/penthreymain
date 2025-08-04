@@ -3,7 +3,7 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
 // API response types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = never> {
   data?: T;
   message?: string;
   error?: string;
@@ -146,13 +146,13 @@ class ApiClient {
     const url = `${this.baseURL}${endpoint}`;
     const token = tokenManager.getAccessToken();
     
-    const headers: HeadersInit = {
+    const headers = new Headers({
       'Content-Type': 'application/json',
       ...options.headers,
-    };
-    
+    });
+  
     if (token) {
-      headers.Authorization = `Bearer ${token}`;
+      headers.set('Authorization', `Bearer ${token}`);
     }
     
     try {
@@ -250,9 +250,9 @@ class ApiClient {
     });
   }
   
-  async logout(): Promise<ApiResponse> {
+  async logout(): Promise<ApiResponse<{ message?: string }>> {
     const refreshToken = tokenManager.getRefreshToken();
-    const response = await this.makeRequest('/auth/logout/', {
+    const response = await this.makeRequest<{ message?: string }>('/auth/logout/', {
       method: 'POST',
       body: JSON.stringify({ refresh: refreshToken }),
     });
