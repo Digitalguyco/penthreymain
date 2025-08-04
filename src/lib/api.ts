@@ -1,6 +1,6 @@
 // API configuration and utility functions for interacting with Django backend
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://penthrey.com/api/v1';
 
 // API response types
 export interface ApiResponse<T = never> {
