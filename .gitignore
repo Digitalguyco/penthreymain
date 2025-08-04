@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+backend/deployment/penthrey.service
+backend/deployment/start_gunicorn.sh
+backend/venv/
+backend/gunicorn.pid
