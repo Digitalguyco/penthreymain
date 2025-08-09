@@ -62,6 +62,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
         return true;
       }
+
+      if (response.error) {
+        setError(response.error);
+      }
       return false;
     } catch (error: unknown) {
       console.error('Login error:', error);

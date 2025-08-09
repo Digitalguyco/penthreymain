@@ -131,12 +131,18 @@ class InviteUserView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsAdminOrManager]
     
     def post(self, request):
-        # Check if organization can add more users
         organization = request.user.organization
-        print(request.data)
+        # Check if organization can add more users
+   
         if not organization.can_add_users():
             return Response({
                 'error': 'User limit reached for your subscription plan'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if the email is already belongs to an organization
+        if User.objects.filter(email=request.data['email']).exists():
+            return Response({
+                'error': f'{request.data["email"]} with this email already exists in your organization.'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = InviteUserSerializer(

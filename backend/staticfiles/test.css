@@ -1,0 +1,9 @@
+/* Test CSS file to verify static files are working */
+body {
+    background-color: #f0f0f0;
+}
+
+.test-class {
+    color: blue;
+    font-size: 16px;
+}

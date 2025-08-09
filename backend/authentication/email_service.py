@@ -86,9 +86,41 @@ class EmailService:
     
     @staticmethod
     def send_password_reset_email(user, reset_token):
-        """Send password reset email (to be implemented)"""
-        # TODO: Create password reset template and implement
-        pass
+        """Send password reset email with styled template"""
+        try:
+            # Build password reset URL
+            reset_url = f"{settings.FRONTEND_URL}/reset-password/{reset_token}"
+            
+            # Render HTML email template
+            html_content = render_to_string('emails/password_reset.html', {
+                'user': user,
+                'reset_url': reset_url,
+                'reset_token': reset_token,
+                'frontend_url': settings.FRONTEND_URL,
+                'current_year': timezone.now().year,
+            })
+            
+            # Create plain text version
+            text_content = strip_tags(html_content)
+            
+            # Send email
+            send_mail(
+                subject='Reset Your Password - Penthrey',
+                message=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                html_message=html_content,
+                fail_silently=False,
+            )
+            
+            logger.info(f"Password reset email sent successfully to {user.email}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to send password reset email to {user.email}: {str(e)}")
+            return False
+
+        
     
     @staticmethod
     def send_welcome_email(user):

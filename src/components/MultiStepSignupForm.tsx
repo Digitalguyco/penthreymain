@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
-import type { RegisterData, ApiResponse } from '@/lib/api';
+import type { RegisterData } from '@/lib/api';
 
 interface FormData {
   // User info (step 1)
@@ -25,8 +25,8 @@ export default function MultiStepSignupForm() {
   const inviteToken = searchParams?.get('token'); // Changed from 'invite' to 'token'
   const isInviteRegistration = !!inviteToken;
   
-  console.log('Signup Form - Invite token:', inviteToken);
-  console.log('Signup Form - Is invite registration:', isInviteRegistration);
+  // console.log('Signup Form - Invite token:', inviteToken);
+  // console.log('Signup Form - Is invite registration:', isInviteRegistration);
   
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
@@ -129,6 +129,33 @@ export default function MultiStepSignupForm() {
       
       const response = await apiClient.register(registrationData);
       console.log('Registration response:', response);
+      setIsSubmitting(false);
+
+      if (response.error) {
+        switch (response.error) {
+          case "{'email': [ErrorDetail(string='This field must be unique.', code='unique')]}":
+            alert('User with this email already exists.');
+            setBackendErrors({ email: 'User with this email already exists' });
+            setCurrentStep(1);
+            // setIsSubmitting(false);
+            break;
+          case "{'username': [ErrorDetail(string='A user with that username already exists.', code='unique')]}":
+            alert('User with this username already exists');
+            setBackendErrors({ username: 'User with this username already exists' });
+            setCurrentStep(1);
+            break;
+          case 'organization_name':
+            alert('User with this organization name already exists');
+            setBackendErrors({ organization_name: 'User with this organization name already exists' });
+            break;
+          default:
+            alert('An error has occured in your application, please try again later.');
+            setCurrentStep(1);
+            setBackendErrors({ error: 'An error has occured in your application, please try again later.' });
+            break;
+        }
+        return;
+      }
       
       if (response.data) {
         console.log('Registration successful, response:', response.data);
@@ -186,35 +213,7 @@ export default function MultiStepSignupForm() {
       }
     } catch (error) {
       console.error('Registration error:', error);
-      
-      const response = error as ApiResponse;
-      console.log('API Response Error (full):', response);
-      console.log('Error message:', response.error);
-      console.log('Validation errors:', response.errors);
-      
-      if (response.errors) {
-        // Format and display validation errors from backend
-        const formattedErrors: Record<string, string> = {};
-        
-        Object.entries(response.errors).forEach(([key, value]) => {
-          if (Array.isArray(value)) {
-            formattedErrors[key] = value.join(', ');
-          } else if (typeof value === 'string') {
-            formattedErrors[key] = value;
-          } else if (value !== null) {
-            formattedErrors[key] = String(value);
-          }
-        });
-        
-        setBackendErrors(formattedErrors);
-      } else if (response.error) {
-        alert(`Registration failed: ${response.error}`);
-      } else {
-        alert('Registration failed. Please try again.');
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+    };
   };
 
   const renderStep1 = () => (

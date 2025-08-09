@@ -1,6 +1,6 @@
 // API configuration and utility functions for interacting with Django backend
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://penthrey.com/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
 
 // API response types
 export interface ApiResponse<T = never> {
@@ -228,6 +228,10 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
+    console.log(response.error)
+    if (response.error) {
+      return { error: response.error };
+    }
     // set tokens
     if (response.data) {
       tokenManager.setTokens({ 
@@ -239,11 +243,6 @@ class ApiClient {
   }
   
   async register(data: RegisterData): Promise<ApiResponse<LoginResponse>> {
-    console.log(data);
-    console.log(this.makeRequest<LoginResponse>('/auth/register/', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }));
     return this.makeRequest<LoginResponse>('/auth/register/', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -263,6 +262,25 @@ class ApiClient {
   
   async getProfile(): Promise<ApiResponse<User>> {
     return this.makeRequest<User>('/auth/profile/');
+  }
+
+  // Password reset endpoints
+  async requestPasswordReset(email: string): Promise<ApiResponse<{ message: string; reset_token?: string }>> {
+    return this.makeRequest<{ message: string; reset_token?: string }>('/auth/password/reset/', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async confirmPasswordReset(token: string, newPassword: string, newPasswordConfirm: string): Promise<ApiResponse<{ message: string }>> {
+    return this.makeRequest<{ message: string }>('/auth/password/reset/confirm/', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        token, 
+        new_password: newPassword,
+        new_password_confirm: newPasswordConfirm
+      }),
+    });
   }
   
   async updateProfile(data: Partial<User>): Promise<ApiResponse<User>> {

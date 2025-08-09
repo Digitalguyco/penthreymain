@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -12,17 +12,26 @@ export default function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const router = useRouter();
-  const { login, error, clearError, loading } = useAuth();
+  const { login, error, clearError, isAuthenticated } = useAuth();
 
+  useEffect(() => {
+
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+   
+  }, [isAuthenticated, router])
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting || loading) return;
+    if (isSubmitting ) return;
     
     setIsSubmitting(true);
     clearError();
     
     try {
       const success = await login(email, password);
+      console.log(success)
       if (success) {
         // Redirect to dashboard after successful login
         router.push('/dashboard');
@@ -158,14 +167,14 @@ export default function LoginForm() {
               <div className="self-stretch flex flex-col justify-start items-start mt-8 gap-4">
                 <button
                   type="submit"
-                  disabled={isSubmitting || loading || !email || !password}
+                  disabled={isSubmitting || !email || !password}
                   className={`w-full max-w-[452px] h-11 px-6 py-3 rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center gap-2 overflow-hidden transition-colors duration-200 ${
-                    isSubmitting || loading || !email || !password
+                    isSubmitting || !email || !password
                       ? 'bg-gray-300 cursor-not-allowed'
                       : 'bg-teal-400 hover:bg-teal-500'
                   }`}
                 >
-                  {(isSubmitting || loading) ? (
+                  {(isSubmitting) ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-zinc-800"></div>
                       <div className="justify-start text-zinc-800 text-sm font-medium font-['Manrope']">Signing in...</div>

@@ -2,18 +2,42 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { apiClient } from '@/lib/api';
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle password reset logic here
-    console.log('Password reset request for:', email);
-    setIsSubmitted(true);
-    setShowAlert(true);
+    
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    setError('');
+    setSuccessMessage('');
+    
+    try {
+      const response = await apiClient.requestPasswordReset(email);
+      
+      if (response.data) {
+        setSuccessMessage(response.data.message);
+        setIsSubmitted(true);
+        setShowAlert(true);
+        console.log('Password reset requested successfully:', response.data);
+      } else if (response.error) {
+        setError(response.error);
+      }
+    } catch (err) {
+      console.error('Password reset request failed:', err);
+      setError('Failed to send password reset email. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCloseAlert = () => {
@@ -64,7 +88,7 @@ export default function ForgotPasswordForm() {
           </div>
 
           {/* Success Alert */}
-          {showAlert && (
+          {showAlert && successMessage && (
             <div className="self-stretch p-4 bg-green-50 rounded-lg outline outline-1 outline-offset-[-1px] outline-green-300 inline-flex justify-start items-start gap-3">
               <div className="w-5 h-5 relative overflow-hidden">
                 <svg className="w-full h-full text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -74,10 +98,10 @@ export default function ForgotPasswordForm() {
               <div className="flex-1 inline-flex flex-col justify-start items-start gap-3">
                 <div className="self-stretch flex flex-col justify-start items-start gap-1">
                   <div className="self-stretch justify-start text-green-700 text-sm font-medium font-['Manrope'] leading-tight">
-                    We&apos;ve sent a password reset link to your email.
+                    Password reset link sent!
                   </div>
                   <div className="self-stretch justify-start text-green-700 text-sm font-normal font-['Manrope'] leading-tight">
-                    Follow the instructions there to create a new password. Didn&apos;t get the email? Check your spam folder or resend it.
+                    {successMessage} Check your spam folder if you don&apos;t see the email.
                   </div>
                 </div>
               </div>
@@ -87,6 +111,37 @@ export default function ForgotPasswordForm() {
               >
                 <div className="w-5 h-5 relative overflow-hidden">
                   <svg className="w-full h-full text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.67} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+              </button>
+            </div>
+          )}
+
+          {/* Error Alert */}
+          {error && (
+            <div className="self-stretch p-4 bg-red-50 rounded-lg outline outline-1 outline-offset-[-1px] outline-red-300 inline-flex justify-start items-start gap-3">
+              <div className="w-5 h-5 relative overflow-hidden">
+                <svg className="w-full h-full text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.25} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div className="flex-1 inline-flex flex-col justify-start items-start gap-3">
+                <div className="self-stretch flex flex-col justify-start items-start gap-1">
+                  <div className="self-stretch justify-start text-red-700 text-sm font-medium font-['Manrope'] leading-tight">
+                    Failed to send reset link
+                  </div>
+                  <div className="self-stretch justify-start text-red-700 text-sm font-normal font-['Manrope'] leading-tight">
+                    {error}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setError('')}
+                className="w-5 h-5 relative p-2 rounded-lg flex justify-center items-center gap-2 overflow-hidden hover:bg-red-100 transition-colors duration-200"
+              >
+                <div className="w-5 h-5 relative overflow-hidden">
+                  <svg className="w-full h-full text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.67} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
@@ -118,12 +173,21 @@ export default function ForgotPasswordForm() {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitted}
+                disabled={isSubmitting || isSubmitted}
                 className="self-stretch px-6 py-3 bg-teal-400 rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center gap-2 overflow-hidden hover:bg-teal-500 disabled:bg-teal-300 disabled:cursor-not-allowed transition-colors duration-200"
               >
-                <div className="justify-start text-zinc-800 text-sm font-medium font-['Manrope']">
-                  {isSubmitted ? 'Reset Link Sent' : 'Send Reset Link'}
-                </div>
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-zinc-800 border-t-transparent" />
+                    <div className="justify-start text-zinc-800 text-sm font-medium font-['Manrope']">
+                      Sending...
+                    </div>
+                  </>
+                ) : (
+                  <div className="justify-start text-zinc-800 text-sm font-medium font-['Manrope']">
+                    {isSubmitted ? 'Reset Link Sent' : 'Send Reset Link'}
+                  </div>
+                )}
               </button>
             </div>
 
@@ -134,7 +198,7 @@ export default function ForgotPasswordForm() {
                   Check your inbox and spam folder. The reset link will expire in{' '}
                 </span>
                 <span className="text-zinc-800 text-xs font-semibold font-['Manrope'] leading-none">
-                  15 minutes
+                  2 hours
                 </span>
                 <span className="text-zinc-600 text-xs font-medium font-['Manrope'] leading-none">
                   .

@@ -36,11 +36,17 @@ class UserRegistrationView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
     
     def create(self, request, *args, **kwargs):
-        print(request.data)
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        # print('here')
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+           
+    #    create user but dont commit yet
         user = serializer.save()
-        print(user)
         
         # Check if this is an invite-based registration
         is_invite_registration = bool(request.data.get('organization_invite_token'))
@@ -68,13 +74,16 @@ class UserRegistrationView(generics.CreateAPIView):
             # FLOW 1: Organization owner registration
             # Requires email verification, no auto-login
             verification_token = None
+    
+          
             try:
                 email_verification = EmailVerification.objects.create(
                     user=user,
                     expires_at=timezone.now() + timedelta(hours=24)
                 )
                 verification_token = email_verification.token
-                email_verification.send_verification_email()
+                print(user,verification_token)
+                email_verification.send_verification_email(user, verification_token)
             except Exception as e:
                 # Log the error but don't fail registration
                 print(f"Failed to send verification email: {e}")
@@ -95,13 +104,20 @@ class UserLoginView(APIView):
     permission_classes = [permissions.AllowAny]
     
     def post(self, request):
-        serializer = UserLoginSerializer(
-            data=request.data,
-            context={'request': request}
-        )
-        serializer.is_valid(raise_exception=True)
+
+        try:
+            serializer = UserLoginSerializer(
+                data=request.data,
+                context={'request': request}
+            )
+            serializer.is_valid(raise_exception=True)
         
-        user = serializer.validated_data['user']
+            user = serializer.validated_data['user']
+        except Exception as e:
+            return Response({
+                'error': "Email or Password is incorrect please try again or Reset Password",
+                'message': 'Login failed'
+            }, status=status.HTTP_404_NOT_FOUND)
         
         # Check email verification for organization owners (admin role)
         if user.role == User.Role.ADMIN and not user.is_verified:
@@ -213,6 +229,8 @@ class PasswordResetRequestView(APIView):
             )
             
             # In production, send email with reset link
+            # set Rest email service
+            EmailService.send_password_reset_email(user, reset_token)
             return Response({
                 'message': 'Password reset email sent',
                 'reset_token': reset_token  # Remove in production
@@ -232,6 +250,7 @@ class PasswordResetConfirmView(APIView):
     permission_classes = [permissions.AllowAny]
     
     def post(self, request):
+        print(request.data)
         serializer = PasswordResetConfirmSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
@@ -394,6 +413,7 @@ def logout_view(request):
     """
     API endpoint for user logout (blacklist refresh token).
     """
+    print(request.data)
     try:
         refresh_token = request.data["refresh"]
         token = RefreshToken(refresh_token)

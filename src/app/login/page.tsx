@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   keywords: 'login, sign in, authentication, workspace access, Penthry',
 };
 
+
 export default function Login() {
+
   return <LoginForm />;
 } 

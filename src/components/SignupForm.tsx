@@ -100,8 +100,56 @@ export default function SignupForm() {
       console.log('Error message:', response.error);
       console.log('Validation errors:', response.errors);
       
+      // Helper function to parse Django ErrorDetail objects from stringified errors
+      const parseErrorString = (errorString: string): Record<string, string> => {
+        try {
+          // Try to extract field errors from Django's stringified error format
+          const formattedErrors: Record<string, string> = {};
+          
+          // Look for patterns like: 'field_name': [ErrorDetail(string='Error message', code='error_code')]
+          const fieldErrorPattern = /'([^']+)':\s*\[ErrorDetail\(string='([^']+)'(?:.*?)\)/g;
+          let match;
+          
+          while ((match = fieldErrorPattern.exec(errorString)) !== null) {
+            const [, fieldName, errorMessage] = match;
+            formattedErrors[fieldName] = errorMessage;
+          }
+          
+          // If no field-specific errors found, try a more general approach
+          if (Object.keys(formattedErrors).length === 0) {
+            // Look for error messages in quotes
+            const generalErrorPattern = /'([^']+)':/g;
+            const messagePattern = /string='([^']+)'/g;
+            
+            let fieldMatch;
+            const fields: string[] = [];
+            while ((fieldMatch = generalErrorPattern.exec(errorString)) !== null) {
+              fields.push(fieldMatch[1]);
+            }
+            
+            let messageMatch;
+            const messages: string[] = [];
+            while ((messageMatch = messagePattern.exec(errorString)) !== null) {
+              messages.push(messageMatch[1]);
+            }
+            
+            // Map fields to messages
+            fields.forEach((field, index) => {
+              if (messages[index]) {
+                formattedErrors[field] = messages[index];
+              }
+            });
+          }
+          
+          return formattedErrors;
+        } catch (e) {
+          console.error('Error parsing error string:', e);
+          return {};
+        }
+      };
+      
       if (response.errors) {
-        // Format and display validation errors from backend
+        // Format and display validation errors from backend (structured errors)
         const formattedErrors: Record<string, string> = {};
         
         // Process errors from DRF via our API client
@@ -117,8 +165,16 @@ export default function SignupForm() {
         
         setBackendErrors(formattedErrors);
       } else if (response.error) {
-        // Handle general error
-        setBackendErrors({ general: response.error });
+        // Try to parse stringified Django validation errors
+        const parsedErrors = parseErrorString(response.error);
+        
+        if (Object.keys(parsedErrors).length > 0) {
+          // We successfully parsed field-specific errors
+          setBackendErrors(parsedErrors);
+        } else {
+          // Handle as general error
+          setBackendErrors({ general: response.error });
+        }
       }
     } finally {
       setIsSubmitting(false);
