@@ -124,9 +124,38 @@ class EmailService:
     
     @staticmethod
     def send_welcome_email(user):
-        """Send welcome email after email verification (to be implemented)"""
-        # TODO: Create welcome email template and implement
-        pass
+        """Send welcome email after email verification"""
+        try:
+            # Build dashboard URL
+            dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
+            
+            # Render HTML email template
+            html_content = render_to_string('emails/welcome_email.html', {
+                'user': user,
+                'dashboard_url': dashboard_url,
+                'frontend_url': settings.FRONTEND_URL,
+                'current_year': timezone.now().year,
+            })
+            
+            # Create plain text version
+            text_content = strip_tags(html_content)
+            
+            # Send email
+            send_mail(
+                subject='Welcome to Penthrey - Your Account is Ready!',
+                message=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                html_message=html_content,
+                fail_silently=False,
+            )
+            
+            logger.info(f"Welcome email sent successfully to {user.email}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to send welcome email to {user.email}: {str(e)}")
+            return False
 
     @staticmethod
     def send_invite_email(email, role, organization, invite_token):

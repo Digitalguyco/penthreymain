@@ -14,6 +14,7 @@ import secrets
 import uuid
 
 from .models import User, EmailVerification, PasswordReset, UserLoginSession
+from .email_service import EmailService
 from .serializers import (
     UserRegistrationSerializer, 
     UserLoginSerializer, 
@@ -23,7 +24,6 @@ from .serializers import (
     PasswordResetConfirmSerializer,
     EmailVerificationSerializer
 )
-from .email_service import EmailService
 from .permissions import IsOwnerOrReadOnly, IsAdminOrManager
 
 
@@ -83,7 +83,7 @@ class UserRegistrationView(generics.CreateAPIView):
                 )
                 verification_token = email_verification.token
                 print(user,verification_token)
-                email_verification.send_verification_email(user, verification_token)
+                EmailService.send_verification_email(user, verification_token)
             except Exception as e:
                 # Log the error but don't fail registration
                 print(f"Failed to send verification email: {e}")
