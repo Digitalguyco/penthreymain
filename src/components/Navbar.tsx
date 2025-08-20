@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 import Link from "next/link";
 import Image from "next/image";
@@ -72,14 +73,13 @@ export default function Navbar() {
               </div>
             
               {/* Logo */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 bg-amber-200">
                 <Link href="/" className="flex items-center">
-                  <Image
-                    src={scrolled ? "/logoBlack.svg" : "/logo.svg"}
+                  <img
+                    src="/logo.svg"
                     alt="Penthrey Logo"
-                    width={120}
-                    height={40}
-                    className="h-10 w-auto"
+                  
+                    className="h-14 w-auto "
                   />
                 </Link>
               </div>

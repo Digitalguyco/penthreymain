@@ -71,7 +71,7 @@ export default function DashboardSidebar({ isMobileMenuOpen = false, setIsMobile
         } ${item.name === 'Log Out' ? 'hover:bg-red-600' : ''}`}
         onClick={handleClick}
       >
-        <Image src={`icons/${item.icon}.svg`} width={15} height={15} alt='alt'/>
+        <Image src={`/icons/${item.icon}.svg`} width={15} height={15} alt='alt'/>
         {!isCollapsed && (
           <div className="text-zinc-100 text-sm font-medium font-['Manrope'] leading-tight">
             {item.name}
@@ -94,7 +94,7 @@ export default function DashboardSidebar({ isMobileMenuOpen = false, setIsMobile
         {!isCollapsed && (
           <div className="flex items-center gap-2.5">
             <div className="flex items-center gap-1">
-              <Image src='logo.svg' width={25} height={25} alt='Penthrey Logo'/>
+              <Image src='/logo.svg' width={25} height={25} alt='Penthrey Logo' className='h-14 w-auto'/>
             </div>
           </div>
         )}
@@ -102,7 +102,7 @@ export default function DashboardSidebar({ isMobileMenuOpen = false, setIsMobile
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="hidden lg:flex w-6 h-6 items-center justify-center text-zinc-100 hover:bg-indigo-800 rounded transition-colors"
         >
-          <Image src='icons/collapse.svg' width={15} height={15} alt='Collapse'/>
+          <Image src='/icons/collapse.svg' width={15} height={15} alt='Collapse'/>
         </button>
         
         {/* Mobile close button */}
@@ -110,7 +110,7 @@ export default function DashboardSidebar({ isMobileMenuOpen = false, setIsMobile
           onClick={handleMobileNavClick}
           className="lg:hidden w-6 h-6 flex items-center justify-center text-zinc-100 hover:bg-indigo-800 rounded transition-colors"
         >
-          <Image src='hamburger.svg' width={15} height={15} alt='Close menu'/>
+          <Image src='/hamburger.svg' width={15} height={15} alt='Close menu'/>
         </button>
       </div>
 
