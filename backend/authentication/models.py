@@ -139,6 +139,12 @@ class EmailVerification(models.Model):
     class Meta:
         ordering = ['-created_at']
     
+    def save(self, *args, **kwargs):
+        if not self.token:
+            import secrets
+            self.token = secrets.token_urlsafe(32)
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return f"Email verification for {self.user.email}"
 
@@ -156,6 +162,12 @@ class PasswordReset(models.Model):
     
     class Meta:
         ordering = ['-created_at']
+    
+    def save(self, *args, **kwargs):
+        if not self.token:
+            import secrets
+            self.token = secrets.token_urlsafe(32)
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"Password reset for {self.user.email}"
