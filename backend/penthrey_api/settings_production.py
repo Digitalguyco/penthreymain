@@ -33,7 +33,7 @@ DATABASES = {
 
 # Static files configuration for production
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'static'
 
 # Media files configuration
 MEDIA_URL = '/media/'

@@ -89,7 +89,7 @@ export default function ForgotPasswordForm() {
 
           {/* Success Alert */}
           {showAlert && successMessage && (
-            <div className="self-stretch p-4 bg-green-50 rounded-lg outline outline-1 outline-offset-[-1px] outline-green-300 inline-flex justify-start items-start gap-3">
+            <div className="self-stretch p-4 bg-green-50 rounded-lg outline-1 outline-offset-[-1px] outline-green-300 inline-flex justify-start items-start gap-3">
               <div className="w-5 h-5 relative overflow-hidden">
                 <svg className="w-full h-full text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.25} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -120,7 +120,7 @@ export default function ForgotPasswordForm() {
 
           {/* Error Alert */}
           {error && (
-            <div className="self-stretch p-4 bg-red-50 rounded-lg outline outline-1 outline-offset-[-1px] outline-red-300 inline-flex justify-start items-start gap-3">
+            <div className="self-stretch p-4 bg-red-50 rounded-lg outline-1 outline-offset-[-1px] outline-red-300 inline-flex justify-start items-start gap-3">
               <div className="w-5 h-5 relative overflow-hidden">
                 <svg className="w-full h-full text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.25} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
