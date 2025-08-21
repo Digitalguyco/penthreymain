@@ -282,6 +282,14 @@ class ApiClient {
       }),
     });
   }
+
+  // Email verification endpoints
+  async verifyEmail(token: string): Promise<ApiResponse<{ message: string }>> {
+    return this.makeRequest<{ message: string }>('/auth/email/verify/', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
+  }
   
   async updateProfile(data: Partial<User>): Promise<ApiResponse<User>> {
     return this.makeRequest<User>('/auth/profile/', {
