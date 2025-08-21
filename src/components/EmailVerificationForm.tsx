@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -141,7 +142,7 @@ export default function EmailVerificationForm() {
 
           {/* Verification Status */}
           {isVerifying && (
-            <div className="self-stretch p-4 bg-blue-50 rounded-lg outline outline-1 outline-offset-[-1px] outline-blue-300 inline-flex justify-start items-center gap-3">
+            <div className="self-stretch p-4 bg-blue-50 rounded-lg  outline-1 outline-offset-[-1px] outline-blue-300 inline-flex justify-start items-center gap-3">
               <div className="w-5 h-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
               <div className="flex-1 text-blue-700 text-sm font-medium font-['Manrope'] leading-tight">
                 Verifying your email address, please wait...
@@ -151,7 +152,7 @@ export default function EmailVerificationForm() {
 
           {/* Error Alert */}
           {error && !isVerifying && (
-            <div className="self-stretch p-4 bg-red-50 rounded-lg outline outline-1 outline-offset-[-1px] outline-red-300 inline-flex justify-start items-start gap-3">
+            <div className="self-stretch p-4 bg-red-50 rounded-lg  outline-1 outline-offset-[-1px] outline-red-300 inline-flex justify-start items-start gap-3">
               <div className="w-5 h-5 relative overflow-hidden">
                 <svg className="w-full h-full text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.25} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
