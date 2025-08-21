@@ -15,6 +15,9 @@ ALLOWED_HOSTS = [
     'www.penthrey.com',
 ]
 
+# WhiteNoise settings
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Database configuration for MySQL
 DATABASES = {
     'default': {
